@@ -1,0 +1,79 @@
+service: mens-main
+
+useDotenv: true
+
+plugins:
+  - serverless-domain-manager
+#  - serverless-dotenv-plugin
+
+custom:
+  env: ${file(env.yml):${opt:stage}}
+  customDomains:
+    - rest:
+        domainName: ${self:custom.env.DOMAIN_ADMIN}
+        basePath: ''
+        createRoute53Record: true
+        certificateArn: ${self:custom.env.AWS_CERTIFICATE_ARN}
+        endpointType: 'regional'
+        securityPolicy: tls_1_2
+        apiType: rest
+        stage: ${opt:stage}
+        autoDomain: false
+    - rest:
+        domainName: ${self:custom.env.DOMAIN_PATIENT}
+        basePath: ''
+        createRoute53Record: true
+        certificateArn: ${self:custom.env.AWS_CERTIFICATE_ARN_SECOND}
+        endpointType: 'regional'
+        securityPolicy: tls_1_2
+        apiType: rest
+        stage: ${opt:stage}
+        autoDomain: false
+
+
+provider:
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: secretsmanager:*
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - kms:Get*
+          Resource: '*'
+  name: aws
+  region: us-west-2
+  ecr:
+    images:
+      appimage:
+        platform: linux/amd64
+        path: ./
+  environment:
+    AWS_SDK_LOAD_CONFIG: ${self:custom.env.AWS_SDK_LOAD_CONFIG}
+    AWS_PROFILE: ${self:custom.env.AWS_PROFILE}
+    AWS_SECRET_MANAGER: ${self:custom.env.AWS_SECRET_MANAGER}
+    AWS_COGNITO_USER_POOL: ${self:custom.env.AWS_COGNITO_USER_POOL}
+    AWS_COGNITO_CLIENT_ID: ${self:custom.env.AWS_COGNITO_CLIENT_ID}
+    AWS_COGNITO_ISSUER: ${self:custom.env.AWS_COGNITO_ISSUER}
+    DB_NAME: ${self:custom.env.DB_NAME}
+    DB_KEYS: ${self:custom.env.DB_KEYS}
+    DB_UUID_KEY: ${self:custom.env.DB_UUID_KEY}
+    DB_ENCRYPT_ALGORITHM_RANDOM: ${self:custom.env.DB_ENCRYPT_ALGORITHM_RANDOM}
+    DB_ENCRYPT_ALGORITHM_DETERMINISTIC: ${self:custom.env.DB_ENCRYPT_ALGORITHM_DETERMINISTIC}
+    DOMAIN_ADMIN: ${self:custom.env.DOMAIN_ADMIN}
+    DOMAIN_PATIENT: ${self:custom.env.DOMAIN_PATIENT}
+functions:
+  main:
+    image: appimage
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
+          authorizer:
+            name: authorizer
+            arn: ${self:custom.env.AWS_COGNITO_ARN}
+

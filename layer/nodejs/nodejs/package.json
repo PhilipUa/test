@@ -1,0 +1,40 @@
+{
+  "name": "import-to-chartmogul",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/handler.js",
+  "scripts": {
+    "deploy:stage": "sls deploy -r us-west-1 -s stage",
+    "invoke:stage": "sls invoke -r us-west-1 -s stage -f onImportToChartmogulHandler",
+    "deploy:production": "sls deploy -r us-west-2 -s production",
+    "invoke:production": "sls invoke -r us-west-2 -s production -f onImportToChartmogulHandler",
+    "invoke:local": "export SLS_DEBUG=* && serverless invoke local -f onImportToChartmogulHandler --stage local",
+    "invoke:local-win": "SET SLS_DEBUG=* && serverless invoke -f onImportToChartmogulHandler local --stage local"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@sentry/serverless": "^6.13.0",
+    "authorizenet": "^1.0.7",
+    "aws-sdk": "^2.610.0",
+    "bcrypt": "^4.0.1",
+    "bcryptjs": "^2.4.3",
+    "bluebird": "^3.7.2",
+    "chartmogul-node": "^2.0.0",
+    "config": "^3.3.0",
+    "lodash": "^4.17.21",
+    "mailchimp-api-v3": "^1.13.1",
+    "mandrill-api": "^1.0.45",
+    "moment": "^2.29.1",
+    "mongodb-client-encryption": "^1.2.6",
+    "mongoose": "^5.8.11",
+    "promise-parallel-throttle": "^3.3.0",
+    "serverless-pseudo-parameters": "^1.6.0",
+    "twilio": "^3.41.1",
+    "uniqid": "^5.2.0",
+    "uuid": "^8.3.2",
+    "uuid-mongodb": "^2.4.4",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {}
+}
